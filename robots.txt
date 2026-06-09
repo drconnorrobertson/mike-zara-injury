@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://mikezarainjurylaw.com/sitemap.xml

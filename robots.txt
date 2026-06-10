@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://mikezarainjurylaw.com/sitemap.xml
+Sitemap: https://mike-zara-injury.vercel.app/sitemap.xml

@@ -2,6 +2,34 @@
 (function () {
   'use strict';
 
+  /* ---- Mobile nav toggle ---- */
+  var toggle = document.getElementById('navToggle');
+  var nav = document.querySelector('nav');
+
+  if (toggle && nav) {
+    toggle.addEventListener('click', function () {
+      toggle.classList.toggle('active');
+      nav.classList.toggle('open');
+      document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+    });
+
+    nav.querySelectorAll('a').forEach(function (lnk) {
+      lnk.addEventListener('click', function () {
+        toggle.classList.remove('active');
+        nav.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (nav.classList.contains('open') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+        toggle.classList.remove('active');
+        nav.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+
   /* ---- Header scroll effect ---- */
   var header = document.querySelector('header');
   if (header) {
@@ -18,7 +46,6 @@
   }
 
   function initReveal() {
-    /* Collect elements to animate */
     document.querySelectorAll(
       '.section, .section-alt, .content-page, .cta-banner, .attorney-hero, .contact-grid, .contact-info, .contact-method'
     ).forEach(function (el) { el.classList.add('reveal'); revealed.push(el); });
@@ -48,7 +75,6 @@
 
     revealed.forEach(function (el) { io.observe(el); });
 
-    /* Fallback: after 3s, reveal anything still hidden (for fast/jump scrolls) */
     setTimeout(function () {
       revealed.forEach(function (el) {
         var rect = el.getBoundingClientRect();
@@ -58,7 +84,6 @@
       });
     }, 2000);
 
-    /* On any scroll, reveal elements that have already been scrolled past */
     var scrollRevealTimer;
     window.addEventListener('scroll', function () {
       clearTimeout(scrollRevealTimer);
@@ -74,14 +99,6 @@
       }, 100);
     }, { passive: true });
   }
-
-  /* ---- Mobile nav — close on link click ---- */
-  document.querySelectorAll('nav a').forEach(function (lnk) {
-    lnk.addEventListener('click', function () {
-      var n = document.querySelector('nav');
-      if (n) n.classList.remove('open');
-    });
-  });
 
   /* ---- Active page highlighting ---- */
   var path = window.location.pathname;

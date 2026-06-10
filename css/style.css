@@ -263,20 +263,45 @@ nav a.active::after {
 
 .nav-toggle {
   display: none;
+  flex-direction: column;
+  gap: 5px;
   background: none;
   border: 1.5px solid rgba(255, 255, 255, 0.2);
-  color: var(--white);
-  font-size: 1.3rem;
   cursor: pointer;
-  padding: 0.4rem 0.65rem;
+  padding: 0.55rem 0.6rem;
   border-radius: 6px;
   transition: all 0.3s var(--ease);
-  line-height: 1;
+  z-index: 1001;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--white);
+  border-radius: 2px;
+  transition: all 0.3s var(--ease);
 }
 
 .nav-toggle:hover {
   border-color: var(--gold);
-  color: var(--gold);
+}
+
+.nav-toggle:hover span {
+  background: var(--gold);
+}
+
+.nav-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.nav-toggle.active span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.nav-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
 }
 
 /* ===================================================
@@ -1109,8 +1134,6 @@ footer a:hover {
 @media (max-width: 768px) {
   .nav-toggle {
     display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   nav {

@@ -10,37 +10,70 @@
     }, { passive: true });
   }
 
-  /* ---- IntersectionObserver — reveal on scroll ---- */
-  var io = ('IntersectionObserver' in window)
-    ? new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) {
-          if (e.isIntersecting) {
-            e.target.classList.add('visible');
-            io.unobserve(e.target);
-          }
-        });
-      }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' })
-    : null;
+  /* ---- Reveal-on-scroll ---- */
+  var revealed = [];
 
-  function observe(el) { if (io) io.observe(el); else el.classList.add('visible'); }
+  function revealAll() {
+    revealed.forEach(function (el) { el.classList.add('visible'); });
+  }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    /* sections */
+  function initReveal() {
+    /* Collect elements to animate */
     document.querySelectorAll(
       '.section, .section-alt, .content-page, .cta-banner, .attorney-hero, .contact-grid, .contact-info, .contact-method'
-    ).forEach(function (el) { el.classList.add('reveal'); observe(el); });
+    ).forEach(function (el) { el.classList.add('reveal'); revealed.push(el); });
 
-    /* grids get staggered children */
     document.querySelectorAll('.grid').forEach(function (g) {
       g.classList.add('stagger-grid');
-      observe(g);
+      revealed.push(g);
     });
 
-    /* sidebar cards */
     document.querySelectorAll('.sidebar-card').forEach(function (el) {
-      el.classList.add('reveal'); observe(el);
+      el.classList.add('reveal'); revealed.push(el);
     });
-  });
+
+    if (!('IntersectionObserver' in window)) {
+      revealAll();
+      return;
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '50px 0px -20px 0px' });
+
+    revealed.forEach(function (el) { io.observe(el); });
+
+    /* Fallback: after 3s, reveal anything still hidden (for fast/jump scrolls) */
+    setTimeout(function () {
+      revealed.forEach(function (el) {
+        var rect = el.getBoundingClientRect();
+        if (rect.bottom < window.innerHeight + 100) {
+          el.classList.add('visible');
+        }
+      });
+    }, 2000);
+
+    /* On any scroll, reveal elements that have already been scrolled past */
+    var scrollRevealTimer;
+    window.addEventListener('scroll', function () {
+      clearTimeout(scrollRevealTimer);
+      scrollRevealTimer = setTimeout(function () {
+        revealed.forEach(function (el) {
+          if (!el.classList.contains('visible')) {
+            var rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight + 50) {
+              el.classList.add('visible');
+            }
+          }
+        });
+      }, 100);
+    }, { passive: true });
+  }
 
   /* ---- Mobile nav — close on link click ---- */
   document.querySelectorAll('nav a').forEach(function (lnk) {
@@ -59,4 +92,11 @@
       lnk.classList.add('active');
     }
   });
+
+  /* ---- Init on DOM ready ---- */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initReveal);
+  } else {
+    initReveal();
+  }
 })();
